@@ -5,8 +5,6 @@ from .models import Address, Phone
 
 
 EMAIL_MOD_FAIL_MSG = dict(email=["Email can't be modified, once set"])
-PSWD_REQUIRED = dict(password=["Password field is required field"])
-
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,7 +35,6 @@ class UserSerializer(serializers.ModelSerializer):
         return dict((i, getattr(obj, i)) for i in _fields)
 
     def create(self, validated_data):
-        print(validated_data)
         address_set = validated_data.pop('address')
         phone_set = validated_data.pop('phone')
         password = validated_data.pop('password')
@@ -46,8 +43,6 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
 
-        # address_set['user'] = user
-        # phone_set['user'] = user
         for addr in address_set:
             Address.objects.create(user_id=user.id, **addr)
         for ph in phone_set:
