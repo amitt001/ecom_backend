@@ -7,6 +7,7 @@ from .models import Address, Phone
 EMAIL_MOD_FAIL_MSG = dict(email=["Email can't be modified, once set"])
 
 class AddressSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Address
         fields = ('address', 'city', 'state', 'pin_code', 'country')

@@ -13,7 +13,8 @@ OS_CHOICE = (
 
 class Mobile(models.Model):
     """Category: MOBILE"""
-
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE)
     colour = models.CharField(max_length=10)
     memory = models.IntegerField(choices=MEMORY_CHOICE, blank=False)
     os = models.CharField(max_length=10, choices=OS_CHOICE, blank=False)

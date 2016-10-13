@@ -19,7 +19,7 @@ class Shoes(models.Model):
     """Category: SHOE"""
 
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name='shoes')
+        Product, on_delete=models.CASCADE)
     size = models.FloatField(blank=False)
     colour = models.CharField(max_length=10)
     shoe_type = models.CharField(

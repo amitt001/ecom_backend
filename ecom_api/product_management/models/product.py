@@ -12,10 +12,8 @@ CATEGORY_CHOICES = (
 
 class Product(models.Model):
     """A base class that defines base attributes of products"""
-    # product_id = models.UUIDField(
-    #     primary_key=True,default=uuid.uuid4, editable=False, unique=True)
-    # id = models.AutoField(
-    #     auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    # TODO: maybe add uniqueness to some fields
+    # TODO: in category add multiple size support
     name = models.CharField(max_length=300, blank=False)
     display_name = models.CharField(max_length=300, blank=True)
     category = models.CharField(
