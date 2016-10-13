@@ -1,3 +1,4 @@
 from product import Product
 from shoes import Shoes
-from mobile import Mobile
+from mobile import Mobiles
+from productmanager import ProductManager

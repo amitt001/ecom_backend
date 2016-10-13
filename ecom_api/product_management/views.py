@@ -1,32 +1,51 @@
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from django.contrib.sites.shortcuts import get_current_site
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_201_CREATED, HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND)
 
-from .models import Shoes, Product, Mobile
+from .models import Shoes, Product, Mobiles, ProductManager
 from .serializers import (
-    ProductSerializer, ShoesSerializer, MobileSerializer)
+    ProductSerializer, ShoesSerializer, MobilesSerializer)
 from .utils import (
     serializer_factory,model_factory, top_level_dict, add_hyperlink)
 
 
 @api_view(['GET'])
 def products(request):
-    """Get all the products irrespective of the product category"""
+    """Get all the products irrespective of the product category
 
-    if request.method == 'GET':
-        # TODO: add some common filters
-        shoes = Shoes.objects.all()
-        serializer = ShoesSerializer(shoes, many=True)
-        top_level_serializer = top_level_dict(serializer.data)
-        # Add hyperlink to itself each resource
-        # using `build_absolute_uri` method for building url
-        return Response(add_hyperlink(request, top_level_serializer))
+    Filters:
+        start: int
+        count: int
+        featured: 0/1 bool
+        in_stock: 0/1 bool
+    """
+    manager = ProductManager()
+    kw = manager.validate_filters(request)
+    products = manager.find(**kw)
+    for category, product in products.iteritems():
+        top_level_serializer = top_level_dict(product)
+        products[category] = add_hyperlink(request, top_level_serializer)
+    # Add hyperlink to itself each resource
+    # using `build_absolute_uri` method for building url
+    return Response(products)
 
 
-    
+@api_view(['GET'])
+def list_categories(request):
+    netloc = 'https//' if request.is_secure() else 'http://'
+    domain = netloc + str(get_current_site(request))
+    manager = ProductManager()
+    categories = dict(
+        (u[0], domain + reverse('categories', kwargs={'category': u[0]}).lower()
+            ) for u in manager.categories)
+    return Response(categories)
+
+
 @api_view(['GET', 'POST'])
 def categories(request, category):
     """Get and create a product belonging to a specific category

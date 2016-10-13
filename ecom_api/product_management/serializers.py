@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Product
 from .models import Shoes
-from .models import Mobile
+from .models import Mobiles
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -23,11 +23,11 @@ class ShoesSerializer(serializers.ModelSerializer):
         return shoe
 
 
-class MobileSerializer(serializers.ModelSerializer):
+class MobilesSerializer(serializers.ModelSerializer):
     product = ProductSerializer(many=False)
 
     class Meta:
-        model = Mobile
+        model = Mobiles
 
     def create(self, validated_data):
         product_set = validated_data.pop('product')

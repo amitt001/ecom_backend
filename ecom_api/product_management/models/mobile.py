@@ -11,7 +11,7 @@ OS_CHOICE = (
     ('ANDROID', 'Android'),
     ('IOS', 'IOS'))
 
-class Mobile(models.Model):
+class Mobiles(models.Model):
     """Category: MOBILE"""
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE)

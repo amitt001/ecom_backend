@@ -6,8 +6,8 @@ from django.dispatch import receiver
 
 # (Stored, Readable value)
 CATEGORY_CHOICES = (
-    ('SHOE', 'Shoes'),
-    ('MOBILE', 'Mobile'))
+    ('Shoes', 'Shoes'),
+    ('Mobiles', 'Mobiles'))
 
 
 class Product(models.Model):
