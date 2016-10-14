@@ -1,10 +1,16 @@
-1. Add filter for all views
+TODO:
+=====
 
-2. OR based search
-
-3. Permissions
+* Permissions
 
 
-Add some common filters - Done
-Improve navigable uri creation for products - Done
+Complete:
+=========
 
+* Add some common filters.
+
+* Improve navigable uri creation for products.
+
+* Add filter for all product views.
+
+*  OR based search
