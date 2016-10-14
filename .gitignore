@@ -1,7 +1,6 @@
 *~
 *.swp
 *.pyc
-*.txt
 *.db
 *.sqlite3
 
