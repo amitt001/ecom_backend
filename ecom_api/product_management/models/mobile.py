@@ -8,7 +8,7 @@ MEMORY_CHOICE = (
     (64, '64 GB'))
 
 OS_CHOICE = (
-    ('ANDROID', 'Android'),
+    ('Android', 'Android'),
     ('IOS', 'IOS'))
 
 class Mobiles(models.Model):

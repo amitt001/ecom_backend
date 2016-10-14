@@ -7,6 +7,7 @@ class ProductManager(object):
     def __init__(self):
         self.start = 0
         self._offset = None
+        self.search_str = None
 
     @property
     def offset(self):
@@ -14,7 +15,7 @@ class ProductManager(object):
 
     @offset.setter
     def offset(self, value):
-        self._offset = None if value is None else value + self.start
+        self._offset = None if value is None else int(value) + self.start
     
     @property
     def product_ids(self):
@@ -27,6 +28,13 @@ class ProductManager(object):
     @property
     def categories(self):
         return Product.objects.order_by().values_list('category').distinct()
+
+    def _search_filters(self, kw):
+        # Add search filters to kw
+        if self.search_str:
+            kw['product__name__icontains'] = self.search_str
+            kw['product__display_name__icontains'] = self.search_str
+        return kw
 
     def _process_filters(self, filter_dict):
         # Add `product__<filter_key>` in case of filters that belongs
@@ -43,8 +51,9 @@ class ProductManager(object):
     def validate_filters(self, request, **kw):
         # Boolean filters possible values 0/1
         # More filters can be added here
-        self.start = request.GET.get('start', 0)
+        self.start = int(request.GET.get('start', 0))
         self.offset = request.GET.get('count')
+        self.search_str = request.GET.get('q')
 
         featured = request.GET.get('featured')
         in_stock = request.GET.get('in_stock')
@@ -62,6 +71,9 @@ class ProductManager(object):
         :return: A dict of serialized category data.
         """
         kwargs = self._process_filters(kwargs)
+        kwargs = self._search_filters(kwargs)
+        print(kwargs, self.start, self.offset)
+        # Query the categories
         mobiles = Mobiles.objects.filter(
             product_id__in=self.product_ids, **kwargs
             ).order_by('id')[self.start:self.offset]

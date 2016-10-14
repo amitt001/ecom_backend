@@ -1,8 +1,11 @@
 import uuid
 from datetime import datetime
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
+from django.core.exceptions import FieldError
 from django.dispatch import receiver
+
+from django.contrib.auth.models import User
 
 # (Stored, Readable value)
 CATEGORY_CHOICES = (
@@ -29,19 +32,29 @@ class Product(models.Model):
     units_on_order = models.IntegerField(blank=True, default=0)
     in_stock = models.BooleanField(default=True, blank=True)
     featured = models.BooleanField(default=False, blank=True)
-    seller_name = models.CharField(max_length=100, blank=True)
     created_on = models.DateTimeField(default=datetime.now(), blank=True)
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
+    # Id of the user added this product
+    seller = models.IntegerField(null=False, default=0)
+    added_by = models.IntegerField(null=False, default=0)
 
     class Meta:
         ordering = ('name',)
 
+@receiver(pre_save, sender=Product)
+def pre_save_task(sender, instance, *args, **kwargs):
+    if instance.quantity_available > instance.quantity:
+        raise FieldError('quantity_available can\'t be more than quantity')
+    if instance.units_on_order > instance.quantity_available:
+        raise FieldError('units_on_order can\'t be more than quantity')
 
 # Product `pre_save` signal
-@receiver(pre_save, sender=Product)
-def pre_save_tasks(sender, instance, *args, **kwargs):
-    instance.display_name = instance.name
-    instance.quantity_available = instance.quantity
-    instance.units_on_order = instance.quantity - instance.quantity_available
+@receiver(post_save, sender=Product)
+def post_save_tasks(sender, instance, *args, **kwargs):
+    if not instance.display_name:
+        instance.display_name = instance.name
+    if not instance.quantity_available:
+        instance.quantity_available = instance.quantity
+        instance.units_on_order = instance.quantity - instance.quantity_available
     if instance.quantity_available > 1:
         instance.in_stock = True

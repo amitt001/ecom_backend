@@ -14,7 +14,6 @@ from django.db import IntegrityError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from .serializers import UserSerializer
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -24,6 +23,7 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED)
 
 from .auth_util import generate_token
+from .serializers import UserSerializer
 
 
 class UserList(APIView):
@@ -34,6 +34,7 @@ class UserList(APIView):
     INTEGRITY_ERROR_MSG = "Email field must be unique"
     permission_classes = (AllowAny,)
 
+    # TODO: set permission here or only show current users data
     def get(self, request):
         # TODO: allow only staff access
         users = User.objects.all()
@@ -41,20 +42,16 @@ class UserList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        # TODO: Store all user info at once
         user_data = request.data
-        address = user_data.pop('address')
-        phone = user_data.pop('phone')
         user = UserSerializer(data=user_data)
         if user.is_valid():
             try:
                 user.save()
             except IntegrityError as e:
-                # To enforce unique email constraint
+                # To convert unique username error as unique email
                 if 'auth_user.username' in e:
                     raise IntegrityError(INTEGRITY_ERROR_MSG)
-                else:
-                    raise
+                else: raise
             return Response(user.data, status=HTTP_201_CREATED)
         return Response(user.errors, status=HTTP_400_BAD_REQUEST)
 

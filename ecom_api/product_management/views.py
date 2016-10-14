@@ -19,10 +19,13 @@ def products(request):
     """Get all the products irrespective of the product category
 
     Filters:
+        q = <search str>
         start: int
         count: int
         featured: 0/1 bool
         in_stock: 0/1 bool
+
+    Sample request: /api/1.0/products/?q=nike&in_stock=1&start=1&count=2
     """
     manager = ProductManager()
     kw = manager.validate_filters(request)
@@ -75,14 +78,15 @@ def categories(request, category):
         return Response(add_hyperlink(request, top_level_serializer))
 
     elif request.method == 'POST':
-        # TODO: handle this
         # If seller info is None and set current user as seller
+        data = request.data
         is_anon = request.user.is_anonymous()
         if request.data.get('seller') is None and is_anon is False:
-            request.data['seller'] = request.user.name
+            data['seller'] = request.user.id
+        if is_anon is False:
+            data['added_by'] = request.user.id
         # Get `Product` model specific data and put it in `product`
         # key for serialization
-        data = request.data
         product_fields = [f.name for f in Product._meta.get_fields()]
         product_data = dict((
             field, data.pop(
@@ -112,7 +116,15 @@ def category(request, category, _id):
         return Response(add_hyperlink(request, top_level_serializer))
 
     elif request.method == 'PUT':
-        serializer = _ProductSerializer(product, data=request.data)
+        data = request.data
+        # Get `Product` model specific data and put it in `product`
+        # key for serialization
+        product_fields = [f.name for f in Product._meta.get_fields()]
+        product_data = dict((
+            field, data.pop(
+                field)) for field in product_fields if field in data)
+        data['product'] = product_data
+        serializer = _ProductSerializer(product, data=data)
         if serializer.is_valid():
             serializer.save()
             top_level_serializer = top_level_dict(serializer.data)

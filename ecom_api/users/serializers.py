@@ -28,12 +28,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id', 'first_name', 'last_name',
-            'email', 'password',
-            'address', 'phone')
+            'email', 'address', 'phone', 'password')
 
-    def ato_representation(self, obj):
-        _fields = ('id', 'first_name', 'last_name', 'email')
-        return dict((i, getattr(obj, i)) for i in _fields)
+    def to_representation(self, obj):
+        representation = super(UserSerializer, self).to_representation(obj)
+        representation.pop('password')
+        return representation
 
     def create(self, validated_data):
         address_set = validated_data.pop('address')
