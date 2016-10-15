@@ -1,18 +1,24 @@
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_201_CREATED, HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND)
+    HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND,
+    HTTP_401_UNAUTHORIZED)
 
 from .models import Product, ProductManager
 from .utils import (
     serializer_factory, model_factory, top_level_dict, add_hyperlink)
 
 
+AUTH_FAIL_MSG = dict(
+    error="Authentication credentials were not provided.")
+
 @api_view(['GET'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def products(request):
     """Get all the products irrespective of the product category
 
@@ -37,6 +43,7 @@ def products(request):
 
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def categories(request, category):
     """Get and create a product belonging to a specific category.
 
@@ -95,19 +102,25 @@ def categories(request, category):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def category(request, category, _id):
     """A specific item/product details view"""
     
     _ProductModel = model_factory(category)
     _ProductSerializer = serializer_factory(category)
-    product = get_object_or_404(_ProductModel, pk=_id)
+    product_obj = get_object_or_404(_ProductModel, pk=_id)
 
     if request.method == 'GET':
-        serializer = _ProductSerializer(product)
+        serializer = _ProductSerializer(product_obj)
         top_level_serializer = top_level_dict(serializer.data)
         return Response(add_hyperlink(request, top_level_serializer))
 
     elif request.method == 'PUT':
+        # Only allow edit if current user added the product or is an admin
+        if not (request.user.is_superuser or
+            request.user.is_staff or
+            product_obj.product.added_by != request.user.id):
+            return Response(AUTH_FAIL_MSG, status=HTTP_401_UNAUTHORIZED)
         data = request.data
         # Get `Product` model specific data and put it in `product`
         # key for serialization
@@ -117,7 +130,7 @@ def category(request, category, _id):
                 field)) for field in product_fields if field in data)
         data['product'] = product_data
 
-        serializer = _ProductSerializer(product, data=data)
+        serializer = _ProductSerializer(product_obj, data=data)
         if serializer.is_valid():
             serializer.save()
             top_level_serializer = top_level_dict(serializer.data)
@@ -125,11 +138,17 @@ def category(request, category, _id):
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        product.delete()
+        # Only dlete if current user added product or is an admin
+        if not (request.user.is_superuser or
+            request.user.is_staff or
+            product_obj.product.added_by != request.user.id):
+            return Response(AUTH_FAIL_MSG, status=HTTP_401_UNAUTHORIZED)
+        product_obj.delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def list_categories(request):
     netloc = 'https//' if request.is_secure() else 'http://'
     domain = netloc + str(get_current_site(request))

@@ -9,9 +9,7 @@ NOTE:
 In `User` model `username` and `email` fields can be used interchangeably.
 Username field is kept for compatability with django `User` model"""
 
-from datetime import datetime
 from django.db import IntegrityError
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
@@ -20,23 +18,28 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_201_CREATED, HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED)
+    HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN)
 
 from .auth_util import generate_token
 from .serializers import UserSerializer
 
 
-class UserList(APIView):
-    """Get users and create users.
-        
-    Allowed methods: GET, POST, DELETE"""
+INTEGRITY_USERNAME_MSG = "Unique constraint failed for column 'email'"
+USERS_FAIL_MSG = dict(
+    detail="Only admin user can access all the user's data.")
 
-    INTEGRITY_ERROR_MSG = "Email field must be unique"
+class UserRegister(APIView):
+    """Get all the users(Only for admin) or register user to get API token.
+        
+    Allowed methods: GET, POST"""
     permission_classes = (AllowAny,)
 
-    # TODO: set permission here or only show current users data
     def get(self, request):
-        # TODO: allow only staff access
+        # Only allow access to registered user. Because Django doesn't
+        # allow method based permission in class
+        if not request.user.is_superuser:
+            return Response(USERS_FAIL_MSG, status=HTTP_403_FORBIDDEN)
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
@@ -48,10 +51,12 @@ class UserList(APIView):
             try:
                 user.save()
             except IntegrityError as e:
-                # To convert unique username error as unique email
-                if 'auth_user.username' in e:
-                    raise IntegrityError(INTEGRITY_ERROR_MSG)
-                else: raise
+                # Convert, if unique username error raised by Django `User`
+                # model, to unique email error
+                if 'auth_user.username' in e.args[0]:
+                    e.args = (INTEGRITY_USERNAME_MSG,)
+                return Response(
+                    dict(error=e.args[0]), status=HTTP_400_BAD_REQUEST)
             return Response(user.data, status=HTTP_201_CREATED)
         return Response(user.errors, status=HTTP_400_BAD_REQUEST)
 
@@ -60,8 +65,6 @@ class UserDetails(APIView):
     """A single user views. A unique user is identified using `pk`
 
     Allowed Methods: GET, POST, DELETE"""
-
-    permission_classes = (AllowAny,)
 
     def get(self, request, id):
         user = get_object_or_404(User, pk=id)
@@ -86,8 +89,12 @@ class UserDetails(APIView):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_token(request):
-    email = request.data['email']
-    password = request.data['password']
+    try:
+        email = request.data['email']
+        password = request.data['password']
+    except KeyError:
+        return Response(
+            dict(error="Email/Password missing"), status=HTTP_400_BAD_REQUEST)
     user = get_object_or_404(User, email=email)
     # Using user object's `check_password` method
     # which compare both the password hashes

@@ -11,17 +11,19 @@ from rest_framework.permissions import AllowAny
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_redirect(request):
+    # Redirect to api/<version>
     return redirect(reverse('endpoints'))
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_endpoints(request):
-    netloc = 'https//' if request.is_secure() else 'http://'
+    """List all the base endpoints initial page of API."""
+    netloc = 'https://' if request.is_secure() else 'http://'
     domain = netloc + str(get_current_site(request))
     api_uri = dict(
         auth_api=dict(
-            register=domain + reverse('userlist'),
+            register=domain + reverse('userregister'),
             authentication=domain + reverse('token'),
             verify_token=domain + reverse('verify')
             ),

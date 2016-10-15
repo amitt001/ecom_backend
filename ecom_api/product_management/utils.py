@@ -1,6 +1,8 @@
+"""Simple utility methods for product_management views"""
+
 from .models import Shoes, Product, Mobiles
-from .serializers import (
-    ProductSerializer, ShoesSerializer, MobilesSerializer)
+from .serializers import ShoesSerializer, MobilesSerializer
+
 
 # Model routing factory based on category
 def model_factory(category):

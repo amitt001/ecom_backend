@@ -23,6 +23,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     address = AddressSerializer(many=True)
     phone = PhoneSerializer(many=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
 
     class Meta:
         model = User

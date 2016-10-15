@@ -1,8 +1,7 @@
 TODO:
 =====
 
-* Permissions
-
+* Tests
 
 Complete:
 =========
@@ -14,3 +13,7 @@ Complete:
 * Add filter for all product views.
 
 *  OR based search
+
+* Permissions
+
+* Tests - users done
