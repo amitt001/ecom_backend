@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -113,10 +114,13 @@ def category(request, category, _id):
         return Response(add_hyperlink(request, top_level_serializer))
 
     elif request.method == 'PUT':
+        # NOTE: is_anonymous allowed because permissions are set from settings
+        # So if permissions are set request wouldb't even come to this view
         # Only allow edit if current user added the product or is an admin
-        if not (request.user.is_superuser or
-            request.user.is_staff) and (
-            product_obj.product.added_by != request.user.id):
+        if not (request.user.is_anonymous() or
+                request.user.is_superuser or
+                request.user.is_staff) and (
+                product_obj.product.added_by != request.user.id):
             return Response(AUTH_FAIL_MSG, status=HTTP_401_UNAUTHORIZED)
         data = request.data
         # Get `Product` model specific data and put it in `product`
@@ -135,10 +139,13 @@ def category(request, category, _id):
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
+        # NOTE: is_anonymous allowed because permissions are set from settings
+        # So if permissions are set request wouldb't even come to this view
         # Only dlete if current user added product or is an admin
-        if not (request.user.is_superuser or
-            request.user.is_staff) and (
-            product_obj.product.added_by != request.user.id):
+        if not (request.user.is_anonymous() or
+                request.user.is_superuser or
+                request.user.is_staff) and (
+                product_obj.product.added_by != request.user.id):
             return Response(AUTH_FAIL_MSG, status=HTTP_401_UNAUTHORIZED)
         product_obj.delete()
         return Response(status=HTTP_204_NO_CONTENT)
