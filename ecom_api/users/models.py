@@ -21,4 +21,4 @@ class Phone(models.Model):
     mobile_no = models.CharField(max_length=10, null=False)
 
     class Meta:
-        unique_together = ('user', 'mobile_no')
+        unique_together = ('country_code', 'mobile_no')

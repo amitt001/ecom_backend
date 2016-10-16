@@ -146,7 +146,7 @@ def category(request, category, _id):
 
 @api_view(['GET'])
 def list_categories(request):
-    netloc = 'https//' if request.is_secure() else 'http://'
+    netloc = 'https://' if request.is_secure() else 'http://'
     domain = netloc + str(get_current_site(request))
     manager = ProductManager()
     categories = dict(

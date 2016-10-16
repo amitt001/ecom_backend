@@ -118,17 +118,19 @@ class ProductManagementTest(APITestCase):
         res_data, _id, category = self.create_product_helper()
         search_string = "iphone"
         url = "{}?q={}".format(
-            reverse('products', kwargs={'category': category, '_id': _id }),
-            search_string)
+            reverse('categories', kwargs={'category': category}), search_string)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            search_string in response.data['name'].lower(), True)
+        if response.data:
+            self.assertEqual(
+                (search_string in response.data[0]['data']['name'].lower() or
+                    search_string in response.data[0]['data']['display_name'].lower()
+                    ), True)
 
     def test_product_count_offset_filter(self):
         res_data, _id, category = self.create_product_helper()
         url = "{}?start=0&offset=1".format(
-            reverse('products', kwargs={'category': category, '_id': _id }))
+            reverse('categories', kwargs={'category': category}))
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 

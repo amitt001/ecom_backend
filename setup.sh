@@ -40,11 +40,12 @@ pushd ecom_api && python manage.py makemigrations && python manage.py migrate &&
 printf "
 Run tests:
 
-    pushd ecom_api && python manage.py test && popd
+    pushd ecom_api && ../env/bin/python manage.py test && popd
 
 To run ecom_api:
 
-    gunicorn --pythonpath ecom_api ecom_api.wsgi --log-file -
+    env/bin/python ecom_api/manage.py runserver
 OR
-    python ecom_api/manage.py runserver\n"
+
+    env/bin/gunicorn --pythonpath ecom_api ecom_api.wsgi --log-file -\n"
 

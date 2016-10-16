@@ -2,12 +2,14 @@
 ECOM Backend
 ============
 
-An eCommerce website backend, that supports add/search/delete/modify products functionality.
+An simple POC eCommerce website backend, that supports add/search/delete/modify products functionality.
+
+Demo App: `http://amitt001.pythonanywhere.com`_
 
 Technology Used:
 ================
 
-Python, Django, Django-rest
+Python, Django, Django-rest, PyJWT
 
 Get the Sources:
 ================
@@ -52,14 +54,17 @@ Open http://127.0.0.1:8000/
 Permissions:
 ============
 
-By default all the product management endpoints have `IsAuthenticatedOrReadOnly` permissions i.e. an anonymous or unauthenticated user can only see the product. For modifying product data(PUT, POST, DELETE) user need to register and use token.
+By default, all the product management endpoints have `IsAuthenticatedOrReadOnly` permissions i.e. an anonymous/unauthenticated user can only see the product. For modifying product data(PUT, POST, DELETE) user need to register and use token.
 
-To use django-rest UI for api testing edit settings.py REST_FRAMEWORK -> DEFAULT_PERMISSION_CLASSES to `rest_framework.permissions.AllowAny`.
+To use django-rest UI for testing comment `settings.py line 61`_ and uncomment line 62
 
 Database:
 =========
 
 This app uses SQLite as the database.
+
 This app uses Django ORM for DB access. So, other SQL DBs like MySQL, PostgreSQL, etc can also be used just by adding the DB info in settings.py file(no need to change any code).
 
 
+.. _`http://amitt001.pythonanywhere.com`: http://amitt001.pythonanywhere.com
+.. _`settings.py`: https://github.com/amitt001/ecom_backend/blob/master/ecom_api/ecom_api/settings.py#L61
