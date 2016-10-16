@@ -67,4 +67,4 @@ This app uses Django ORM for DB access. So, other SQL DBs like MySQL, PostgreSQL
 
 
 .. _`http://amitt001.pythonanywhere.com`: http://amitt001.pythonanywhere.com
-.. _`settings.py`: https://github.com/amitt001/ecom_backend/blob/master/ecom_api/ecom_api/settings.py#L61
+.. _`settings.py line 61`: https://github.com/amitt001/ecom_backend/blob/master/ecom_api/ecom_api/settings.py#L61
