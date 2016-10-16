@@ -18,8 +18,7 @@ AUTH_FAIL_MSG = dict(
     error="Authentication credentials were not provided.")
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticatedOrReadOnly])
-def products(request):
+def all_products(request):
     """Get all the products irrespective of the product category
 
     Sample URL: /api/1.0/products/?q=moto&in_stock=1&start=1&count=2
@@ -43,7 +42,6 @@ def products(request):
 
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticatedOrReadOnly])
 def categories(request, category):
     """Get and create a product belonging to a specific category.
 
@@ -102,7 +100,6 @@ def categories(request, category):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticatedOrReadOnly])
 def category(request, category, _id):
     """A specific item/product details view"""
     
@@ -118,7 +115,7 @@ def category(request, category, _id):
     elif request.method == 'PUT':
         # Only allow edit if current user added the product or is an admin
         if not (request.user.is_superuser or
-            request.user.is_staff or
+            request.user.is_staff) and (
             product_obj.product.added_by != request.user.id):
             return Response(AUTH_FAIL_MSG, status=HTTP_401_UNAUTHORIZED)
         data = request.data
@@ -140,7 +137,7 @@ def category(request, category, _id):
     elif request.method == 'DELETE':
         # Only dlete if current user added product or is an admin
         if not (request.user.is_superuser or
-            request.user.is_staff or
+            request.user.is_staff) and (
             product_obj.product.added_by != request.user.id):
             return Response(AUTH_FAIL_MSG, status=HTTP_401_UNAUTHORIZED)
         product_obj.delete()
@@ -148,12 +145,11 @@ def category(request, category, _id):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticatedOrReadOnly])
 def list_categories(request):
     netloc = 'https//' if request.is_secure() else 'http://'
     domain = netloc + str(get_current_site(request))
     manager = ProductManager()
     categories = dict(
-        (u[0], domain + reverse('categories', kwargs={'category': u[0]}).lower()
-            ) for u in manager.categories)
+        (u, domain + reverse('categories', kwargs={'category': u}).lower()
+            ) for u in manager.categories.keys())
     return Response(categories)

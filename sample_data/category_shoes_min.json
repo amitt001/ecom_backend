@@ -1,0 +1,11 @@
+
+{
+    "name": "Nike T Sports",
+    "category": "Shoes",
+    "manufacturer": "Nike",
+    "price": 1999,
+    "quantity": 20,
+    "size": 9,
+    "colour": "Yellow",
+    "shoe_type": "MOUNTAINEERING"
+}

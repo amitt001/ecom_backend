@@ -1,8 +1,6 @@
 TODO:
 =====
 
-* Tests
-
 Complete:
 =========
 
@@ -17,3 +15,5 @@ Complete:
 * Permissions
 
 * Tests - users done
+
+* Tests - products done

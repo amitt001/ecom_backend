@@ -1,9 +1,9 @@
 import uuid
-from datetime import datetime
 from django.db import models
 from django.db.models.signals import pre_save, post_save
-from django.core.exceptions import FieldError
 from django.dispatch import receiver
+from django.core.exceptions import FieldError
+from django.utils import timezone
 
 from django.contrib.auth.models import User
 
@@ -32,7 +32,7 @@ class Product(models.Model):
     units_on_order = models.IntegerField(blank=True, default=0)
     in_stock = models.BooleanField(default=True, blank=True)
     featured = models.BooleanField(default=False, blank=True)
-    created_on = models.DateTimeField(default=datetime.now(), blank=True)
+    created_on = models.DateTimeField(default=timezone.now(), blank=True)
     updated_at = models.DateTimeField(auto_now_add=True, blank=True)
     # Id of the user added this product
     seller = models.IntegerField(null=False, default=0)

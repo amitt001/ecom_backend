@@ -1,0 +1,10 @@
+{"address": [{"address": "Dum",
+   "city": "New Delhi",
+   "country": "India",
+   "pin_code": "110038",
+   "state": "Delhi"}],
+ "email": "test@gmail.com",
+ "first_name": "Dummy",
+ "last_name": "Test",
+ "password": "dummy",
+ "phone": [{"country_code": "+91", "mobile_no": "9999999999"}]}

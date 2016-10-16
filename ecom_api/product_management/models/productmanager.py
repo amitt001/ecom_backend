@@ -30,7 +30,10 @@ class ProductManager(object):
 
     @property
     def categories(self):
-        return Product.objects.order_by().values_list('category').distinct()
+        # return Product.objects.order_by().values_list('category').distinct()
+        return {
+            'shoes': {'model': Shoes, 'serializer': ShoesSerializer},
+            'mobiles': {'model': Mobiles, 'serializer': MobilesSerializer}}
 
     def _search_filters(self, Queryset):
         # If present, add search filters to `QuerySet`

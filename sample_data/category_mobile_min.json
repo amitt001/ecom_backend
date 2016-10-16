@@ -1,0 +1,13 @@
+{
+    "name": "Moto G Turbo",
+    "category": "Mobiles",
+    "manufacturer": "Moto",
+    "price": 1999,
+    "quantity": 20,
+    "size": 9,
+    "colour": "Yellow",
+    "os": "Android",
+    "memory": 32,
+    "ram":"3",
+    "processor": "SnapDragon"
+}

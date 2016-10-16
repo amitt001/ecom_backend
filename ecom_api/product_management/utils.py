@@ -1,22 +1,15 @@
 """Simple utility methods for product_management views"""
 
-from .models import Shoes, Product, Mobiles
-from .serializers import ShoesSerializer, MobilesSerializer
+from .models import ProductManager
 
 
 # Model routing factory based on category
 def model_factory(category):
-    return {
-        'shoes': Shoes,
-        'mobiles': Mobiles,
-    }[category.lower()]
+    return ProductManager().categories[category.lower()]['model']
 
 # Serializer routing factory based on category
 def serializer_factory(category):
-    return {
-        'shoes': ShoesSerializer,
-        'mobiles': MobilesSerializer,
-    }[category.lower()]
+    return ProductManager().categories[category.lower()]['serializer']
 
 # converts a nested dict to top level dict
 # Supports both list of dicts or a dict
