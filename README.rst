@@ -19,9 +19,9 @@ Get the Sources:
 Testing:
 ========
 
-For testing I am using Django tests. To run tests::
+To run tests, cd into ecom_api directory and run this command::
 
-    python -m unittest
+    python manage.py test
 
 Setup:
 ======
