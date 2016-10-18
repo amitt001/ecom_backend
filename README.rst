@@ -6,6 +6,8 @@ An simple POC eCommerce website backend, that supports add/search/delete/modify 
 
 Demo App: `http://amitt001.pythonanywhere.com`_
 
+Docs: http://bit.ly/2eiXTD7
+
 Technology Used:
 ================
 
